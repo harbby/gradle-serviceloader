@@ -1,0 +1,16 @@
+package com.github.harbby.gradle.plugins.serviceloader.dsl
+
+def buildScript = context(scriptType: 'gradle')
+def project = context(ctype: 'org.gradle.api.Project')
+
+contributor([buildScript, project]) {
+	method name: 'serviceLoader', type: 'void', params: [closure: 'groovy.lang.Closure']
+	property name: 'serviceLoader', type: 'com.github.harbby.gradle.plugins.serviceloader.extensions.ServiceLoaderExtension'
+}
+
+def serviceLoaderBody = context(scope: closureScope())
+contributor(serviceLoaderBody) {
+	if (enclosingCall('serviceLoader')) {
+		delegatesTo(findClass('com.github.harbby.gradle.plugins.serviceloader.extensions.ServiceLoaderExtension'))
+	}
+}

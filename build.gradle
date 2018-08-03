@@ -1,0 +1,78 @@
+apply plugin: 'java-gradle-plugin'
+apply plugin: JavaPlugin
+apply plugin: MavenPlugin
+
+group='com.github.harbby'
+version='1.0.2'
+
+
+
+dependencies {
+	testCompile gradleTestKit()
+}
+
+test {
+	useTestNG()
+	testLogging {
+		exceptionFormat = 'full'
+	}
+	def tmpDir = new File(buildDir, 'tmp')
+	systemProperty 'java.io.tmpdir', tmpDir.canonicalPath
+	doFirst {
+		project.mkdir(tmpDir)
+	}
+}
+
+/*
+  * Make sure our DSL helper file makes it into the jar for IDE auto-complete
+  */
+def stageGroovyDSL = tasks.create('stageGroovyDSL', Copy).with {
+	from(sourceSets.main.allSource) {
+		include '**/*.gdsl'
+	}
+	into sourceSets.main.output.classesDir
+	it
+}
+tasks.findByName('jar')?.dependsOn stageGroovyDSL
+
+
+def m2repoPath = (System.getenv('M2_REPO_DIRECTORY') ?: buildDir.path) + "/.m2"
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			repository(url: new File(m2repoPath).toURL())
+			pom.project {
+				licenses {
+					license {
+						name 'The Apache Software License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+			}
+		}
+	}
+}
+
+task createPluginClasspath {
+	description = 'Writes a manifest of the classpath to be used within tests.'
+	def outputDir = file("${buildDir}/${name}")
+	inputs.files sourceSets.main.runtimeClasspath
+	outputs.dir(outputDir)
+	doLast {
+		outputDir.mkdirs()
+		file("${outputDir}/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+	}
+	processTestResources.dependsOn it
+}
+
+dependencies {
+	testCompile files(createPluginClasspath)
+}
+
+task copyJavaTestClassesToResources(type: Copy) {
+	def pl = project.convention.getPlugin(JavaPluginConvention)
+	from pl.sourceSets.findByName(SourceSet.TEST_SOURCE_SET_NAME).allJava
+	into pl.sourceSets.findByName(SourceSet.TEST_SOURCE_SET_NAME).output.resourcesDir
+	project.tasks.findByName('processTestResources').dependsOn(it)
+}
+
