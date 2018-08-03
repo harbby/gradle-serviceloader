@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/harbby/gradle-serviceloader.svg?branch=master)](https://travis-ci.org/harbby/gradle-serviceloader)
 
-# gradle-serviceloader-manifest
+# gradle-serviceloader
 _Generate java.util.ServiceLoader manifests for your projects_
 
 
