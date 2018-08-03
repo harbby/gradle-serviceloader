@@ -1,6 +1,7 @@
 package com.github.harbby.gradle.plugins.serviceloader.tasks;
 
 import org.gradle.api.Project;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.AbstractTask;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.JavaPluginConvention;
@@ -21,6 +22,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -37,7 +39,7 @@ public class ServiceLoaderTask
 
     @InputDirectory
     @SkipWhenEmpty
-    private final File classesOutput;
+    private final FileCollection classesOutput;
 
     @OutputDirectory
     private final File outputDirectory;
@@ -57,10 +59,30 @@ public class ServiceLoaderTask
         super.setGroup("Source Generation");
 
         javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-        main = javaConvention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
+        this.main = javaConvention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
         SourceSetOutput mainOutput = main.getOutput();
-        classesOutput = mainOutput.getClassesDir().getCanonicalFile();
+        classesOutput = mainOutput.getClassesDirs();
         outputDirectory = new File(mainOutput.getResourcesDir(), "META-INF/services");
+    }
+
+    private static List<String> getClassNames(FileCollection classesOutput)
+    {
+        Set<String> classesDirs = classesOutput.getFiles().stream().map(File::getPath).collect(Collectors.toSet());
+        List<String> classNames = classesOutput.getAsFileTree().getFiles().stream()
+                .filter(it -> it.isFile() && it.getName().endsWith(".class"))
+                .map(it -> {
+                    for (String dirPath : classesDirs) {
+                        if (it.getPath().startsWith(dirPath)) {
+                            return it.getPath().substring(dirPath.length() + 1)
+                                    .replaceAll(".class", "")
+                                    .replaceAll("/", ".");
+                        }
+                    }
+                    //TODO: this is error file ...
+                    return it.getPath();
+                })
+                .collect(Collectors.toList());
+        return classNames;
     }
 
     @TaskAction
@@ -75,7 +97,7 @@ public class ServiceLoaderTask
         for (File file : main.getCompileClasspath().getFiles()) {
             classpath.add(file.toURI().toURL());
         }
-        logger.debug("{} deps: {}",project.getName(),classpath);
+        logger.debug("{} deps: {}", project.getName(), classpath);
 
         try (URLClassLoader classloader = URLClassLoader.newInstance(classpath.toArray(new URL[classpath.size()]))) {
             for (String serviceInterface : serviceInterfaces) {
@@ -83,11 +105,7 @@ public class ServiceLoaderTask
                 Class<?> serviceClass = classloader.loadClass(serviceInterface);
                 logger.debug("Found {}", serviceClass);
 
-                List<String> classNames = project.fileTree(classesOutput).getFiles().stream()
-                        .filter(it -> it.isFile() && it.getName().endsWith(".class"))
-                        .map(it -> classesOutput.toURI().relativize(it.toURI()).getPath().replaceAll(".class", "")
-                                .replaceAll("/", "."))
-                        .collect(Collectors.toList());
+                List<String> classNames = getClassNames(classesOutput);
                 logger.debug("Will consider {}", classNames);
 
                 List<Class<?>> classes = new ArrayList<>(classNames.size());
