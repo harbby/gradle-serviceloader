@@ -11,7 +11,7 @@ architectures.
 
 ## Installation
 
-### Within a standalone build.gradle
+### build.gradle
 ```groovy
 apply plugin: 'com.github.harbby.gradle.serviceloader'
 
