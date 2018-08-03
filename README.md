@@ -17,12 +17,10 @@ apply plugin: 'com.github.harbby.gradle.serviceloader'
 
 buildscript {
 	repositories {
-		maven {
-			url 'https://harbby.github.io/.m2/'
-		}
+        maven { url 'https://harbby.github.io/.m2/repository/' }
 	}
 	dependencies {
-		classpath 'com.github.harbby:gradle-serviceloader:1.0.2'
+		classpath 'com.github.harbby:gradle-serviceloader:1.1.1'
 	}
 }
 ```
