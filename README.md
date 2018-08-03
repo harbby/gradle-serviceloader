@@ -27,32 +27,13 @@ buildscript {
 }
 ```
 
-### With a buildSrc directory
-#### buildSrc/build.gradle
-```groovy
-repositories {
-	maven {
-		url 'https://delphyne.github.io/.m2/'
-	}
-}
-
-dependencies {
-	compile 'com.github.delphyne:gradle-service-loader-manifest:1.0.2'
-}
-```
-
-#### build.gradle
-```groovy
-apply plugin: 'com.github.delphyne.service-loader-manifest'
-```
-
 ## Usage
 
-Add a `serviceLoader` block to your build.gradle.  For example, if you have an interface `com.github.delphyne.Widget`
+Add a `serviceLoader` block to your build.gradle.
 
 ```groovy
 serviceLoader {
-    serviceInterface 'com.github.delphyne.Widget'
+    serviceInterface 'ideal.sylph.spi.Runner'
 }
 ```
 
@@ -60,8 +41,8 @@ Multiple interfaces may be provided to generate a manifest for each provided int
 
 ```groovy
 serviceLoader {
-    serviceInterface 'com.github.delphyne.Widget'
-    serviceInterface 'com.github.delphyne.Action'
+    serviceInterface 'ideal.sylph.spi.Runner'
+    serviceInterface 'ideal.sylph.api.PipelinePlugin'
 }
 ```
 
