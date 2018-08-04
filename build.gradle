@@ -6,22 +6,10 @@ group='com.github.harbby'
 version='1.1.1'
 
 
-
 dependencies {
 	testCompile gradleTestKit()
 }
 
-test {
-	useTestNG()
-	testLogging {
-		exceptionFormat = 'full'
-	}
-	def tmpDir = new File(buildDir, 'tmp')
-	systemProperty 'java.io.tmpdir', tmpDir.canonicalPath
-	doFirst {
-		project.mkdir(tmpDir)
-	}
-}
 
 /*
   * Make sure our DSL helper file makes it into the jar for IDE auto-complete
@@ -51,28 +39,5 @@ uploadArchives {
 			}
 		}
 	}
-}
-
-task createPluginClasspath {
-	description = 'Writes a manifest of the classpath to be used within tests.'
-	def outputDir = file("${buildDir}/${name}")
-	inputs.files sourceSets.main.runtimeClasspath
-	outputs.dir(outputDir)
-	doLast {
-		outputDir.mkdirs()
-		file("${outputDir}/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
-	}
-	processTestResources.dependsOn it
-}
-
-dependencies {
-	testCompile files(createPluginClasspath)
-}
-
-task copyJavaTestClassesToResources(type: Copy) {
-	def pl = project.convention.getPlugin(JavaPluginConvention)
-	from pl.sourceSets.findByName(SourceSet.TEST_SOURCE_SET_NAME).allJava
-	into pl.sourceSets.findByName(SourceSet.TEST_SOURCE_SET_NAME).output.resourcesDir
-	project.tasks.findByName('processTestResources').dependsOn(it)
 }
 
