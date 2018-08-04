@@ -115,7 +115,10 @@ public class ServiceLoaderTask
 
                 logger.debug("Successfully loaded {}", classes);
 
-                List<Class<?>> implementations = classes.stream().filter(it -> !(it.isInterface() || Modifier.isAbstract(it.getModifiers())) && Modifier.isPublic(it.getModifiers()) && serviceClass.isAssignableFrom(it)).collect(Collectors.toList());
+                List<Class<?>> implementations = classes.stream()
+                        .filter(it -> !(it.isInterface() || Modifier.isAbstract(it.getModifiers())) && Modifier.isPublic(it.getModifiers()) && serviceClass.isAssignableFrom(it))
+                        .filter(it -> it.getCanonicalName() != null)  //Scala exists in an empty condition
+                        .collect(Collectors.toList());
 
                 logger.warn("Found {} implementations of {}: {}", implementations.size(), serviceInterface, implementations);
 
@@ -135,7 +138,6 @@ public class ServiceLoaderTask
             }
         }
     }
-
 }
 
 /*
