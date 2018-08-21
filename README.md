@@ -1,33 +1,43 @@
 [![Build Status](https://travis-ci.org/harbby/gradle-serviceloader.svg?branch=master)](https://travis-ci.org/harbby/gradle-serviceloader)
 
 # gradle-serviceloader
-_Generate java.util.ServiceLoader manifests for your projects_
 
++ This plugin is used to generate the ```META-INF/services/``` files 
++ used by the [ServiceLoader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html)
++ mechanism built into Java 6 (and higher). 
 
-This plugin is used to generate the ```META-INF/services/``` manifest files used by the [ServiceLoader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html)
-mechanism built into Java 6 (and higher).  Using the service loader, you can specify a particular interface you want to load, and all implementations
-which have an appropriate manifest on the classpath will be found an available to your application.  This is particularly useful for SPI and Plugin
+Using the service loader, you can specify a particular interface you want to load,and all implementations
+which have an appropriate on the classpath will be found an available to your application.  This is particularly useful for SPI and Plugin
 architectures.
 
 ## Installation
 
 ### build.gradle
+Build script snippet for plugins DSL for Gradle 2.1 and later:
 ```groovy
-apply plugin: 'com.github.harbby.gradle.serviceloader'
-
-buildscript {
-	repositories {
-		maven { url 'https://harbby.github.io/.m2/repository/' }
-	}
-	dependencies {
-		classpath 'com.github.harbby:gradle-serviceloader:1.1.1'
-	}
+plugins {
+  id "com.github.harbby.gradle.serviceloader" version "1.1.2"
 }
+```
+Build script snippet for use in older Gradle versions or where dynamic configuration is required:
+```groovy
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.github.harbby:gradle-serviceloader:1.1.2"
+  }
+}
+
+apply plugin: "com.github.harbby.gradle.serviceloader"
 ```
 
 ## Usage
 
-Add a `serviceLoader` block to your build.gradle.
+Add a `serviceLoader` to your build.gradle.
 
 ```groovy
 serviceLoader {
@@ -39,9 +49,22 @@ Multiple interfaces may be provided to generate a manifest for each provided int
 
 ```groovy
 serviceLoader {
-    serviceInterface 'ideal.sylph.spi.Runner'
-    serviceInterface 'ideal.sylph.api.PipelinePlugin'
+    serviceInterface 'ideal.xx.xx.XXInterface'
+    serviceInterface 'ideal.xx.xx.XXInterface'
 }
 ```
 
-A GDSL file has been provided which will provide code completion within editors that support it.   
+## other
+The following is for testing
+```groovy
+ apply plugin: 'com.github.harbby.gradle.serviceloader'
+ 
+ buildscript {
+ 	repositories {
+ 		maven { url 'https://harbby.github.io/.m2/repository/' }
+ 	}
+ 	dependencies {
+ 		classpath 'com.github.harbby:gradle-serviceloader:1.1.2'
+ 	}
+ }
+ ```
