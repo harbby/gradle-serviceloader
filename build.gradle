@@ -77,7 +77,7 @@ gradlePlugin {
 // The configuration example below shows the minimum required properties
 // configured to publish your plugin to the plugin portal
 pluginBundle {
-	website = 'http://www.gradle.org/'
+	website = 'https://github.com/harbby/gradle-serviceloader'
 	vcsUrl = 'https://github.com/harbby/gradle-serviceloader'
 	description = 'this is java serviceloader plugin' +
 					'\n' +
