@@ -9,7 +9,7 @@ apply plugin: JavaPlugin
 apply plugin: MavenPlugin
 
 group='com.github.harbby'
-version='1.1.2'
+version='1.1.5'
 
 
 dependencies {
@@ -65,6 +65,7 @@ repositories {
 }
 
 // Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
+// Use ./gradlew clean assemble publishPlugins
 gradlePlugin {
 	plugins {
 		greetingsPlugin {
@@ -80,12 +81,12 @@ pluginBundle {
 	website = 'https://github.com/harbby/gradle-serviceloader'
 	vcsUrl = 'https://github.com/harbby/gradle-serviceloader'
 	description = 'this is java serviceloader plugin' +
-					'\n' +
-					'Usage\n' +
-					'serviceLoader {\n' +
-					'    serviceInterface \'ideal.sylph.spi.Runner\'\n' +
-					'    serviceInterface \'ideal.sylph.api.PipelinePlugin\'\n' +
-					'}'
+					'\n\n' +
+					'\tUsage:\n' +
+					'\t\tserviceLoader {\n' +
+					'\t\t\t    serviceInterface \'ideal.sylph.spi.Runner\'\n' +
+					'\t\t\t    serviceInterface \'ideal.sylph.api.PipelinePlugin\'\n' +
+					'\t\t}'
 	tags = ['java_spi', 'serviceloader']
 
 	plugins {

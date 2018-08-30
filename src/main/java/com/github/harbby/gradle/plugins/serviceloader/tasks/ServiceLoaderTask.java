@@ -65,7 +65,7 @@ public class ServiceLoaderTask
         outputDirectory = new File(mainOutput.getResourcesDir(), "META-INF/services");
     }
 
-    private static List<String> getClassNames(FileCollection classesOutput)
+    private List<String> getClassNames(FileCollection classesOutput)
     {
         Set<String> classesDirs = classesOutput.getFiles().stream().map(File::getPath).collect(Collectors.toSet());
         List<String> classNames = classesOutput.getAsFileTree().getFiles().stream()
@@ -73,12 +73,14 @@ public class ServiceLoaderTask
                 .map(it -> {
                     for (String dirPath : classesDirs) {
                         if (it.getPath().startsWith(dirPath)) {
-                            return it.getPath().substring(dirPath.length() + 1)
-                                    .replaceAll(".class", "")
-                                    .replaceAll("/", ".");
+                            String classString = it.getPath().substring(dirPath.length() + 1)
+                                    .replace(".class", "")
+                                    .replace(File.separator, ".");  //
+                            return classString;
                         }
                     }
                     //TODO: this is error file ...
+                    logger.error("class[{}] not startsWith in {}", it, classesDirs);
                     return it.getPath();
                 })
                 .collect(Collectors.toList());

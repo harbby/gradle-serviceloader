@@ -12,6 +12,8 @@ architectures.
 
 ## Installation
 
+https://plugins.gradle.org/plugin/com.github.harbby.gradle.serviceloader
+
 ### build.gradle
 Build script snippet for plugins DSL for Gradle 2.1 and later:
 ```groovy
