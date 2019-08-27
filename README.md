@@ -2,8 +2,8 @@
 
 # gradle-serviceloader
 java code  plugin example
-add scala support
 
++ add scala support
 + This plugin is used to generate the ```META-INF/services/``` files 
 + used by the [ServiceLoader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html)
 + mechanism built into Java 6 (and higher). 
