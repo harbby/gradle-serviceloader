@@ -4,9 +4,6 @@
 java code  plugin example
 add scala support
 
-## link
-https://github.com/delphyne/gradle-serviceloader-manifest
-
 + This plugin is used to generate the ```META-INF/services/``` files 
 + used by the [ServiceLoader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html)
 + mechanism built into Java 6 (and higher). 
@@ -14,6 +11,9 @@ https://github.com/delphyne/gradle-serviceloader-manifest
 Using the service loader, you can specify a particular interface you want to load,and all implementations
 which have an appropriate on the classpath will be found an available to your application.  This is particularly useful for SPI and Plugin
 architectures.
+
+## link
+https://github.com/delphyne/gradle-serviceloader-manifest
 
 ## Installation
 
