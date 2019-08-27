@@ -1,6 +1,11 @@
 [![Build Status](https://travis-ci.org/harbby/gradle-serviceloader.svg?branch=master)](https://travis-ci.org/harbby/gradle-serviceloader)
 
 # gradle-serviceloader
+java code  plugin example
+add scala support
+
+## link
+https://github.com/delphyne/gradle-serviceloader-manifest
 
 + This plugin is used to generate the ```META-INF/services/``` files 
 + used by the [ServiceLoader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html)
