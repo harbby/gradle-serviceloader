@@ -126,7 +126,7 @@ public class ServiceLoaderTask
 
                 if (implementations.isEmpty()) {
                     logger.warn("No implementations found for {}", serviceInterface);
-                    return;
+                    continue;
                 }
 
                 File manifest = new File(outputDirectory, serviceInterface);
