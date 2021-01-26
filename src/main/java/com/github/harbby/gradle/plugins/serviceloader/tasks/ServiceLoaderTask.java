@@ -141,31 +141,3 @@ public class ServiceLoaderTask
         }
     }
 }
-
-/*
- 复制如下task 到您的工程中 build.gradle 进行测试
- 可以测式 ClassesDirs变量值 加快开发验证
-
-task parserClasspath() {
-    def javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-    def main = javaConvention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);  //main sourceSets
-    SourceSetOutput mainOutput = main.getOutput()
-
-    println('----------------demo 1----------------')
-    println(mainOutput.getClassesDirs().getFiles())
-    println(mainOutput.getClassesDirs().getAsFileTree().getFiles())
-
-
-    println('----------------demo 2----------------')
-    SourceSetOutput mainOutput2 = sourceSets.findByName(SourceSet.MAIN_SOURCE_SET_NAME).getOutput()
-    println(mainOutput2.getClassesDirs().getFiles())
-    println(mainOutput2.getClassesDirs().getAsFileTree().getFiles())
-
-    println('----------------demo 3----------------')
-    println(sourceSets.main.getOutput().getClassesDirs().getFiles())
-    println(sourceSets.main.getOutput().getClassesDirs().getAsFileTree().getFiles())
-}
-parserClasspath.dependsOn assemble
-
-*/
-
