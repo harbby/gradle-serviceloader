@@ -9,7 +9,7 @@ apply plugin: JavaPlugin
 apply plugin: MavenPlugin
 
 group='com.github.harbby'
-version='1.1.5'
+version='1.1.6'
 
 
 dependencies {
