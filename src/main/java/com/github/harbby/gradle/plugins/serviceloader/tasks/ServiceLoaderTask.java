@@ -1,10 +1,10 @@
 package com.github.harbby.gradle.plugins.serviceloader.tasks;
 
+import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.internal.AbstractTask;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
@@ -28,13 +28,12 @@ import java.util.stream.Collectors;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ServiceLoaderTask
-        extends AbstractTask
+        extends DefaultTask
 {
     private final Logger logger = super.getLogger();
     private final Project project = super.getProject();
 
     @Input
-    @SkipWhenEmpty
     private List<String> serviceInterfaces;
 
     @InputDirectory
@@ -44,7 +43,7 @@ public class ServiceLoaderTask
     @OutputDirectory
     private final File outputDirectory;
 
-    private final JavaPluginConvention javaConvention;
+    private final JavaPluginExtension javaConvention;
     private final SourceSet main;
 
     public void setServiceInterfaces(List<String> serviceInterfaces)
@@ -58,11 +57,26 @@ public class ServiceLoaderTask
         super.setDescription("Generate META-INF/services manifests for use with ServiceLoaders");
         super.setGroup("Source Generation");
 
-        javaConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
+        javaConvention = project.getExtensions().getByType(JavaPluginExtension.class);
         this.main = javaConvention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
         SourceSetOutput mainOutput = main.getOutput();
         classesOutput = mainOutput.getClassesDirs();
         outputDirectory = new File(mainOutput.getResourcesDir(), "META-INF/services");
+    }
+
+    public FileCollection getClassesOutput()
+    {
+        return classesOutput;
+    }
+
+    public File getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    public List<String> getServiceInterfaces()
+    {
+        return serviceInterfaces;
     }
 
     private List<String> getClassNames(FileCollection classesOutput)
@@ -79,7 +93,6 @@ public class ServiceLoaderTask
                             return classString;
                         }
                     }
-                    //TODO: this is error file ...
                     logger.error("class[{}] not startsWith in {}", it, classesDirs);
                     return it.getPath();
                 })
