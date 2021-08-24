@@ -5,17 +5,12 @@ import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.JavaPluginExtension;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputDirectory;
-import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetOutput;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -30,20 +25,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class ServiceLoaderTask
         extends DefaultTask
 {
-    private final Logger logger = super.getLogger();
-    private final Project project = super.getProject();
+    private final Logger logger;
+    private final Project project;
 
-    @Input
     private List<String> serviceInterfaces;
 
-    @InputDirectory
-    @SkipWhenEmpty
     private final FileCollection classesOutput;
 
-    @OutputDirectory
     private final File outputDirectory;
 
-    private final JavaPluginExtension javaConvention;
     private final SourceSet main;
 
     public void setServiceInterfaces(List<String> serviceInterfaces)
@@ -52,31 +42,19 @@ public class ServiceLoaderTask
     }
 
     public ServiceLoaderTask()
-            throws IOException
     {
         super.setDescription("Generate META-INF/services manifests for use with ServiceLoaders");
         super.setGroup("Source Generation");
 
-        javaConvention = project.getExtensions().getByType(JavaPluginExtension.class);
+        this.logger = super.getLogger();
+        this.project = super.getProject();
+
+        JavaPluginExtension javaConvention = project.getExtensions().getByType(JavaPluginExtension.class);
         this.main = javaConvention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
+        assert main != null;
         SourceSetOutput mainOutput = main.getOutput();
         classesOutput = mainOutput.getClassesDirs();
         outputDirectory = new File(mainOutput.getResourcesDir(), "META-INF/services");
-    }
-
-    public FileCollection getClassesOutput()
-    {
-        return classesOutput;
-    }
-
-    public File getOutputDirectory()
-    {
-        return outputDirectory;
-    }
-
-    public List<String> getServiceInterfaces()
-    {
-        return serviceInterfaces;
     }
 
     private List<String> getClassNames(FileCollection classesOutput)
@@ -115,26 +93,25 @@ public class ServiceLoaderTask
         logger.debug("{} deps: {}", project.getName(), classpath);
 
         try (URLClassLoader classloader = URLClassLoader.newInstance(classpath.toArray(new URL[classpath.size()]))) {
+            List<String> classNames = getClassNames(classesOutput);
+            logger.debug("Will consider {}", classNames);
+            List<Class<?>> classes = new ArrayList<>(classNames.size());
+            for (String it : classNames) {
+                Class<?> aClass = classloader.loadClass(it);
+                if (!(aClass.isInterface() || Modifier.isAbstract(aClass.getModifiers()))
+                        && Modifier.isPublic(aClass.getModifiers())
+                        && aClass.getCanonicalName() != null) {
+                    classes.add(aClass);
+                }
+            }
+            logger.debug("Successfully loaded {}", classes);
+
             for (String serviceInterface : serviceInterfaces) {
                 logger.debug("Search for {} in {}", serviceInterface, classpath);
                 Class<?> serviceClass = classloader.loadClass(serviceInterface);
                 logger.debug("Found {}", serviceClass);
 
-                List<String> classNames = getClassNames(classesOutput);
-                logger.debug("Will consider {}", classNames);
-
-                List<Class<?>> classes = new ArrayList<>(classNames.size());
-                for (String it : classNames) {
-                    classes.add(classloader.loadClass(it));
-                }
-
-                logger.debug("Successfully loaded {}", classes);
-
-                List<Class<?>> implementations = classes.stream()
-                        .filter(it -> !(it.isInterface() || Modifier.isAbstract(it.getModifiers())) && Modifier.isPublic(it.getModifiers()) && serviceClass.isAssignableFrom(it))
-                        .filter(it -> it.getCanonicalName() != null)  //Scala exists in an empty condition
-                        .collect(Collectors.toList());
-
+                List<Class<?>> implementations = classes.stream().filter(serviceClass::isAssignableFrom).collect(Collectors.toList());
                 logger.warn("Found {} implementations of {}: {}", implementations.size(), serviceInterface, implementations);
 
                 if (implementations.isEmpty()) {
