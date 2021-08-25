@@ -1,0 +1,4 @@
+//deploy: ./gradlew clean assemble -Ptarget=java8
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8

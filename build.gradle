@@ -10,6 +10,12 @@ apply plugin: JavaPlugin
 group='com.github.harbby'
 version='1.1.8'
 
+sourceCompatibility = 16
+targetCompatibility = 16
+
+if(project.hasProperty('target')) {
+	apply from: "${project.target}.gradle"
+}
 
 dependencies {
 	testImplementation group: 'junit', name: 'junit', version: '4.12'

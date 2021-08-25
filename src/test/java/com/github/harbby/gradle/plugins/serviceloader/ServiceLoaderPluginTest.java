@@ -1,9 +1,5 @@
 package com.github.harbby.gradle.plugins.serviceloader;
 
-import org.gradle.api.Action;
-import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.testfixtures.ProjectBuilder;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
