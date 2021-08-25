@@ -1,56 +1,52 @@
 plugins {
-	id "com.gradle.plugin-publish" version "0.10.0"
+	id "com.gradle.plugin-publish" version "0.15.0"
 	id "java-gradle-plugin"
 	// Apply other plugins here, e.g. the kotlin plugin for a plugin written in Kotlin
 	// or the groovy plugin if the plugin uses Groovy
 }
 apply plugin: 'java-gradle-plugin'
 apply plugin: JavaPlugin
-apply plugin: MavenPlugin
 
 group='com.github.harbby'
-version='1.1.6'
+version='1.1.8'
 
+sourceCompatibility = 16
+targetCompatibility = 16
+
+if(project.hasProperty('target')) {
+	apply from: "${project.target}.gradle"
+}
 
 dependencies {
-	testCompile gradleTestKit()
+	testImplementation group: 'junit', name: 'junit', version: '4.12'
+	testImplementation gradleTestKit()
 }
 
 
 /*
   * Make sure our DSL helper file makes it into the jar for IDE auto-complete
   */
-def stageGroovyDSL = tasks.create('stageGroovyDSL', Copy).with {
+task stageGroovyDSL(type: Copy) {
 	from(sourceSets.main.allSource) {
 		include '**/*.gdsl'
 	}
-	into sourceSets.main.output.classesDir
-	it
+	into sourceSets.main.output.classesDirs.asPath
 }
-tasks.findByName('jar')?.dependsOn stageGroovyDSL
+jar.dependsOn stageGroovyDSL
+validatePlugins.dependsOn stageGroovyDSL
+pluginUnderTestMetadata.dependsOn stageGroovyDSL
+javadoc.dependsOn stageGroovyDSL
 
-
-def m2repoPath = (System.getenv('M2_REPO_DIRECTORY') ?: buildDir.path) + "/.m2"
-uploadArchives {  //  ./gradlew clean assemble upload
-	repositories {
-		mavenDeployer {
-			repository(url: new File(m2repoPath).toURL())
-			pom.project {
-				licenses {
-					license {
-						name 'The Apache Software License, Version 2.0'
-						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-					}
-				}
-			}
-		}
-	}
+tasks.named("processResources") {
+	duplicatesStrategy = 'include'
 }
+tasks.withType(org.gradle.jvm.tasks.Jar) { duplicatesStrategy = 'include' }
+
 
 /*---------- publishing gradle  plugin--------*/
 // First, apply the publishing plugin
 //plugins {
-//	id "com.gradle.plugin-publish" version "0.10.0"
+//	id "com.gradle.plugin-publish" version "0.15.0"
 //	id "java-gradle-plugin"
 //	// Apply other plugins here, e.g. the kotlin plugin for a plugin written in Kotlin
 //	// or the groovy plugin if the plugin uses Groovy
@@ -61,7 +57,7 @@ uploadArchives {  //  ./gradlew clean assemble upload
 // so you should probably use JCenter for dependency resolution in your own
 // project.
 repositories {
-	jcenter()
+	mavenCentral()
 }
 
 // Use java-gradle-plugin to generate plugin descriptors and specify plugin ids
