@@ -9,7 +9,7 @@ public class ServiceLoaderExtension
 
     private final List<String> serviceInterfaces = new ArrayList<>();
 
-    ServiceLoaderExtension serviceInterface(String... serviceInterfaces)
+    public ServiceLoaderExtension serviceInterface(String... serviceInterfaces)
     {
         for (String it : serviceInterfaces) {
             this.serviceInterfaces.add(it);
