@@ -23,7 +23,7 @@ https://plugins.gradle.org/plugin/com.github.harbby.gradle.serviceloader
 Build script snippet for plugins DSL for Gradle 2.1 and later:
 ```groovy
 plugins {
-  id "com.github.harbby.gradle.serviceloader" version "1.1.8"
+  id "com.github.harbby.gradle.serviceloader" version "1.1.9"
 }
 ```
 Build script snippet for use in older Gradle versions or where dynamic configuration is required:
@@ -35,7 +35,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.com.github.harbby:gradle-serviceloader:1.1.8"
+    classpath "gradle.plugin.com.github.harbby:gradle-serviceloader:1.1.9"
   }
 }
 
@@ -71,7 +71,7 @@ The following is for testing
  		maven { url 'https://harbby.github.io/.m2/repository/' }
  	}
  	dependencies {
- 		classpath 'com.github.harbby:gradle-serviceloader:1.1.8'
+ 		classpath 'com.github.harbby:gradle-serviceloader:1.1.9'
  	}
  }
  ```

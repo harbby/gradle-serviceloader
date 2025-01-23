@@ -32,7 +32,7 @@ public class ServiceLoaderPluginTest {
     public void serviceloaderTest() throws IOException {
         var name = UUID.randomUUID().toString().replaceAll("-", "");
         var group = "com.github.harbby";
-        var version = "1.1.8";
+        var version = "1.1.9";
         var pluginInterface = "test.TestInterface";
         Files.writeString(new File(projectDir, "build.gradle").toPath(), """
                 plugins {
@@ -43,7 +43,7 @@ public class ServiceLoaderPluginTest {
                 }
                 group = '%s'
                 version = '%s'
-                """.stripIndent().formatted(pluginInterface, group, version));
+                """.formatted(pluginInterface, group, version));
 
         Files.writeString(new File(projectDir, "settings.gradle").toPath(), "rootProject.name='%s'".formatted(name));
 
